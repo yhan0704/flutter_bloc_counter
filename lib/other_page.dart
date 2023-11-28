@@ -7,9 +7,9 @@ class OtherPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Other'),
+        title: Text('Other'),
       ),
-      body: const Center(
+      body: Center(
         child: Text(
           'Other',
           style: TextStyle(fontSize: 52.0),

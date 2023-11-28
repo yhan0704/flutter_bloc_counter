@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_counter_bloc/blocs/bloc/counter_bloc.dart';
-import 'package:my_counter_bloc/other_page.dart';
+import 'package:my_counter_bloc/blocs/bloc/theme_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,15 +12,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CounterBloc(),
-      child: MaterialApp(
-        title: 'My Counter Bloc',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const MyHomePage(),
+    return BlocProvider<ThemeBloc>(
+      create: (context) => ThemeBloc(),
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Event Payload',
+            debugShowCheckedModeBanner: false,
+            theme: state.appTheme == AppTheme.light
+                ? ThemeData.light()
+                : ThemeData.dark(),
+            home: const MyHomePage(),
+          );
+        },
       ),
     );
   }
@@ -29,75 +33,25 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
-  void showCounterDialog(BuildContext context, int counter) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Text('counter is $counter'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void navigateToOtherPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return const OtherPage();
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<CounterBloc, CounterState>(
-        listener: (context, state) {
-          if (state.counter == 3) {
-            showCounterDialog(context, state.counter);
-          } else if (state.counter == -1) {
-            navigateToOtherPage(context);
-          }
-        },
-        child: Center(
-          child: Text(
-            '${context.watch<CounterBloc>().state.counter}',
-            style: const TextStyle(fontSize: 52.0),
-          ),
-        ),
+      appBar: AppBar(
+        title: Text('Theme'),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              BlocProvider.of<CounterBloc>(context)
-                  .add(IncrementCounterEvent());
-            },
-            heroTag: 'increment',
-            child: const Icon(Icons.add),
+      body: Center(
+        child: ElevatedButton(
+          child: Text(
+            'Change Theme',
+            style: TextStyle(fontSize: 24.0),
           ),
-          const SizedBox(width: 10.0),
-          FloatingActionButton(
-            onPressed: () {
-              BlocProvider.of<CounterBloc>(context)
-                  .add(DecrementCounterEvent());
-            },
-            heroTag: 'decrement',
-            child: const Icon(Icons.remove),
-          ),
-        ],
+          onPressed: () {
+            final int randInt = Random().nextInt(10);
+            print('randInt: $randInt');
+
+            context.read<ThemeBloc>().add(ChangeThemeEvent(randInt: randInt));
+          },
+        ),
       ),
     );
   }

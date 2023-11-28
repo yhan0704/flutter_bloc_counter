@@ -7,6 +7,6 @@ sealed class CounterEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class incrementCounterEvent extends CounterEvent {}
+class IncrementCounterEvent extends CounterEvent {}
 
-class decrementCounterEvent extends CounterEvent {}
+class DecrementCounterEvent extends CounterEvent {}

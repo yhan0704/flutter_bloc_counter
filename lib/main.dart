@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_counter_bloc/blocs/bloc/theme_bloc.dart';
+
+import 'blocs/color/color_bloc.dart';
+import 'blocs/counter/counter_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,19 +13,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ThemeBloc>(
-      create: (context) => ThemeBloc(),
-      child: BlocBuilder<ThemeBloc, ThemeState>(
-        builder: (context, state) {
-          return MaterialApp(
-            title: 'Event Payload',
-            debugShowCheckedModeBanner: false,
-            theme: state.appTheme == AppTheme.light
-                ? ThemeData.light()
-                : ThemeData.dark(),
-            home: const MyHomePage(),
-          );
-        },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ColorBloc>(
+          create: (context) => ColorBloc(),
+        ),
+        BlocProvider<CounterBloc>(
+          create: (context) => CounterBloc(
+            colorBloc: context.read<ColorBloc>(),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'bloc2bloc',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const MyHomePage(),
       ),
     );
   }
@@ -36,21 +42,40 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Theme'),
-      ),
+      backgroundColor: context.watch<ColorBloc>().state.color,
       body: Center(
-        child: ElevatedButton(
-          child: Text(
-            'Change Theme',
-            style: TextStyle(fontSize: 24.0),
-          ),
-          onPressed: () {
-            final int randInt = Random().nextInt(10);
-            print('randInt: $randInt');
-
-            context.read<ThemeBloc>().add(ChangeThemeEvent(randInt: randInt));
-          },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              child: Text(
+                'Change Color',
+                style: TextStyle(fontSize: 24.0),
+              ),
+              onPressed: () {
+                context.read<ColorBloc>().add(ChangeColorEvent());
+              },
+            ),
+            SizedBox(height: 20.0),
+            Text(
+              '${context.watch<CounterBloc>().state.counter}',
+              style: TextStyle(
+                fontSize: 52.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              child: Text(
+                'Increment Counter',
+                style: TextStyle(fontSize: 24.0),
+              ),
+              onPressed: () {
+                context.read<CounterBloc>().add(ChangeCounterEvent());
+              },
+            ),
+          ],
         ),
       ),
     );

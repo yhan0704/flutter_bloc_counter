@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'blocs/color/color_bloc.dart';
-import 'blocs/counter/counter_bloc.dart';
+import 'counter/counter_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,93 +12,57 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<ColorBloc>(
-          create: (context) => ColorBloc(),
+    return MaterialApp(
+      title: 'Bloc Context',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: BlocProvider(
+          create: (context) => CounterCubit(),
+          child: ChildWidget(),
         ),
-        BlocProvider<CounterBloc>(
-          create: (context) => CounterBloc(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'bloc2bloc',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const MyHomePage(),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class ChildWidget extends StatelessWidget {
+  const ChildWidget({
+    super.key,
+  });
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int incrementSize = 1;
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ColorBloc, ColorState>(
-      listener: (context, colorState) {
-        if (colorState.color == Colors.red) {
-          incrementSize = 1;
-        } else if (colorState.color == Colors.green) {
-          incrementSize = 10;
-        } else if (colorState.color == Colors.blue) {
-          incrementSize = 100;
-        } else if (colorState.color == Colors.black) {
-          incrementSize = -100;
-          context
-              .read<CounterBloc>()
-              .add(ChangeCounterEvent(incrementSize: incrementSize));
-        }
-      },
-      child: Scaffold(
-        backgroundColor: context.watch<ColorBloc>().state.color,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                child: Text(
-                  'Change Color',
-                  style: TextStyle(fontSize: 24.0),
-                ),
-                onPressed: () {
-                  context.read<ColorBloc>().add(ChangeColorEvent());
-                },
-              ),
-              SizedBox(height: 20.0),
-              Text(
-                '${context.watch<CounterBloc>().state.counter}',
-                style: TextStyle(
-                  fontSize: 52.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 20.0),
-              ElevatedButton(
-                child: Text(
-                  'Increment Counter',
-                  style: TextStyle(fontSize: 24.0),
-                ),
-                onPressed: () {
-                  context
-                      .read<CounterBloc>()
-                      .add(ChangeCounterEvent(incrementSize: incrementSize));
-                },
-              ),
-            ],
-          ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '${BlocProvider.of<CounterCubit>(context, listen: true).state.counter}',
+          style: TextStyle(fontSize: 52.0),
         ),
-      ),
+        ElevatedButton(
+          child: Text(
+            'Increment',
+            style: TextStyle(fontSize: 20.0),
+          ),
+          onPressed: () {
+            BlocProvider.of<CounterCubit>(context).increment();
+          },
+        )
+      ],
     );
   }
 }

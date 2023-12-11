@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_counter_bloc/counter/counter_cubit.dart';
 
 import 'show_me_counter.dart';
 
@@ -17,7 +19,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      home: BlocProvider<CounterCubit>(
+        create: (context) => CounterCubit(),
+        child: MyHomePage(),
+      ),
     );
   }
 }
@@ -36,8 +41,11 @@ class MyHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) {
-                    return ShowMeCounter();
+                  MaterialPageRoute(builder: (counterContext) {
+                    return BlocProvider.value(
+                      value: context.read<CounterCubit>(),
+                      child: ShowMeCounter(),
+                    );
                   }),
                 );
               },
@@ -48,7 +56,9 @@ class MyHomePage extends StatelessWidget {
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                BlocProvider.of<CounterCubit>(context).increment();
+              },
               child: Text(
                 'Increment Counter',
                 style: TextStyle(fontSize: 20.0),

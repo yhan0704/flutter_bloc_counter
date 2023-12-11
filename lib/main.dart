@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'counter/counter_cubit.dart';
+import 'show_me_counter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bloc Context',
+      title: 'Anonymous Route',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -30,39 +29,34 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: BlocProvider(
-          create: (context) => CounterCubit(),
-          child: ChildWidget(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return ShowMeCounter();
+                  }),
+                );
+              },
+              child: Text(
+                'Show Me Counter',
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () {},
+              child: Text(
+                'Increment Counter',
+                style: TextStyle(fontSize: 20.0),
+              ),
+            )
+          ],
         ),
       ),
-    );
-  }
-}
-
-class ChildWidget extends StatelessWidget {
-  const ChildWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          '${BlocProvider.of<CounterCubit>(context, listen: true).state.counter}',
-          style: TextStyle(fontSize: 52.0),
-        ),
-        ElevatedButton(
-          child: Text(
-            'Increment',
-            style: TextStyle(fontSize: 20.0),
-          ),
-          onPressed: () {
-            BlocProvider.of<CounterCubit>(context).increment();
-          },
-        )
-      ],
     );
   }
 }

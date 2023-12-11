@@ -6,6 +6,10 @@ class CounterState extends Equatable {
     required this.counter,
   });
 
+  factory CounterState.initial() {
+    return CounterState(counter: 0);
+  }
+
   @override
   List<Object> get props => [counter];
 

@@ -5,11 +5,11 @@ import 'counter/counter_cubit.dart';
 import 'show_me_counter.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -58,7 +58,10 @@ class MyHomePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/counter');
+                Navigator.pushNamed(
+                  context,
+                  '/counter',
+                );
               },
               child: Text(
                 'Show Me Counter',
